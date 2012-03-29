@@ -40,6 +40,10 @@ class mbString
 		{
 			return $codetable[$match[0]];
 		}
+		else if($match[0] == "\x0A" || $match[0] == "\x0D")
+		{
+			return $match[0];
+		}
 		else
 		{
 			return '\\x' . bin2hex($match[0]);
@@ -67,6 +71,10 @@ class mbString
 		{
 			return $codetable[$match[0]];
 		}
+		else if($match[0] == "\x0A" || $match[0] == "\x0D")
+		{
+			return $match[0];
+		}
 		else
 		{
 			return '\\u' . bin2hex($match[0]);
@@ -87,11 +95,16 @@ class mbString
 		if(!file_exists($codetable_path))
 		{
 			$tables = array();
+		
+			$table = self::parseSJIS(
+				dirname( __FILE__ ) . DIRECTORY_SEPARATOR. "SHIFTJIS.TXT");
+			
+			$tables["SjisToUTF8"] = self::serializeCodeTable($table);
 			
 			$table = self::parseCP932(
 				dirname( __FILE__ ) . DIRECTORY_SEPARATOR. "CP932.TXT");
 
-			$tables["SjisToUTF8"] = self::serializeCodeTable($table);
+			$tables["SjisWinToUTF8"] = self::serializeCodeTable($table);
 			
 			self::saveCodeTables($tables);
 		}
@@ -101,11 +114,11 @@ class mbString
 		return true;
 	}
 	
-	private static function parseCP932($cp932path)
+	private static function parseToUTF8Table($tablepath)
 	{
 		$table = array();
 		
-		$lines = file($cp932path);
+		$lines = file($tablepath);
 		
 		if($lines === false)
 		{
@@ -154,6 +167,16 @@ class mbString
 		}
 		
 		return $table;
+	}
+	
+	private static function parseSJIS($sjispath)
+	{
+		return self::parseToUTF8Table($sjispath);
+	}
+	
+	private static function parseCP932($cp932path)
+	{
+		return self::parseToUTF8Table($cp932path);
 	}
 	
 	private static function  serializeToHexStringFromInt($val)
@@ -229,7 +252,7 @@ __EOM__;
 				$comma = ",";
 			}
 			
-			$code .= "\n\t);\n";
+			$code .= "\n\t);\n\n";
 		}
 		
 		$code .= <<<__EOM__
