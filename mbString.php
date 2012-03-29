@@ -40,7 +40,7 @@ class mbString
 		{
 			return $codetable[$match[0]];
 		}
-		else if($match[0] == "\x0A" || $match[0] == "\x0D")
+		else if(preg_match('/^[\x00-\x1F]$/', $match[0]))
 		{
 			return $match[0];
 		}
