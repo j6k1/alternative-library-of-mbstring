@@ -97,7 +97,7 @@ class mbString
 			$tables = array();
 		
 			$table = self::parseSJIS(
-				dirname( __FILE__ ) . DIRECTORY_SEPARATOR. "SHIFTJIS.TXT");
+				dirname( __FILE__ ) . DIRECTORY_SEPARATOR. "SJIS2004.TXT");
 			
 			$tables["SjisToUTF8"] = self::serializeCodeTable($table);
 			
