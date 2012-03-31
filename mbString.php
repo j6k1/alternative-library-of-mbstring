@@ -134,7 +134,7 @@ class mbString
 			
 			list($sjiscode, $unicode) = explode("\t", $line);
 			
-			if(preg_match('/^0x([\dA-F][\dA-F]){2}$/i', $unicode) == 0)
+			if(preg_match('/^0x([\dA-F][\dA-F]){2}[\dA-F]?$/i', $unicode) == 0)
 			{
 				continue;
 			}
@@ -147,6 +147,7 @@ class mbString
 			list(,$unicode) = explode("x", $unicode);
 			
 			$sjiscode = hexdec($sjiscode);
+			
 			$unicode = hexdec($unicode);
 			
 			if($unicode <= 0x7F)
@@ -158,9 +159,16 @@ class mbString
 				$table[$sjiscode] = pack('C2', (0xC0 | ($unicode >> 6)), 
 					0x80 | ($unicode & 0x3F));
 			}
-			else
+			else if($unicode <= 0xFFFF)
 			{
 				$table[$sjiscode] = pack('C3', (0xE0 | ($unicode >> 12)), 
+					0x80 | (($unicode >> 6) & 0x3F), 
+					0x80 | ($unicode & 0x3F));
+			}
+			else
+			{
+				$table[$sjiscode] = pack('C4', (0x07 | ($unicode >> 21)), 
+					0x80 | (($unicode >> 12) & 0x3F), 
 					0x80 | (($unicode >> 6) & 0x3F), 
 					0x80 | ($unicode & 0x3F));
 			}
